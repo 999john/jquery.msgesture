@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta name="viewport" content="user-scalable=no">
+		<script src="jquery.js"></script>
+		<script src="../lib/jquery.msgesture.js"></script>
+		<style>
+			html, body {
+				 -ms-user-select: none;
+			}
+
+			body {
+				background-color: #1A0045;
+				background-image: url('snow.gif');
+			}
+
+	        .container {
+	            /*position: absolute;*/
+	            overflow: visible;
+	            margin: 0px;
+	            padding: 0px;
+	        }
+
+			.surface {
+				display: inline-block;
+				width: 15em;
+				border: solid black 2px;
+				margin: 1em;
+				height: 12em;
+				-ms-touch-action: none;
+				z-index: 0;
+				background-image: url('http://4.bp.blogspot.com/--WxOXhB4S74/Tt8SFVe2AEI/AAAAAAAAAmM/WGlxgyAOOcc/s1600/futurama-204-santa-noel.jpg');
+				background-size: 100%;
+			}
+
+			#a {
+				background-color: red;
+				color: white;
+				font-weight: bold;
+				padding: 1em;
+				font-size: 1em;
+				background-image: url('http://www.theproducersperspective.com/wp-content/uploads/2012/08/Sean-Connery-as-James-Bond.jpg');
+			}
+
+			#b {
+				background-color: green;
+			}
+
+			#c {
+				background-color: blue;
+			}
+
+			#d {
+				background-color: orange;
+			}
+
+			#e {
+				background-color: purple;
+			}
+
+			#f {
+				background-color: yellow;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div id="a" class="surface">
+				The Besht
+			</div>
+			<div id="b" class="surface">
+			</div>
+			<div id="c" class="surface">
+				Drag me up or down
+			</div>
+			<div id="d" class="surface">
+			</div>
+			<div id="e" class="surface">
+			</div>
+			<div id="f" class="surface">
+			</div>
+		</div>
+		<script>
+			function dumpObj(o) {
+					for (var key in o) {
+						console.log(key + ' => ' + o[key]);
+					}			
+			}
+
+			var SWIPE_THRESHOLD = 300; // time to detect full swipe in ms
+
+			$('#a').gesture({
+				change: function (e) {
+	                var m = new MSCSSMatrix(e.target.currentStyle.transform); // Get the latest CSS transform on the element
+	                e.target.style.transform = m
+	                .translate(e.offsetX, e.offsetY) // Move the transform origin under the center of the gesture
+	                .translate(e.translationX, 0) // Apply Translation
+	                .translate(-e.offsetX, -e.offsetY); // Move the transform origin back
+				}
+			});
+
+			$('#c').gesture({
+				change: function (e) {
+	                var m = new MSCSSMatrix(e.target.currentStyle.transform); // Get the latest CSS transform on the element
+	                e.target.style.transform = m
+	                .translate(e.offsetX, e.offsetY) // Move the transform origin under the center of the gesture
+	                .translate(0, e.translationY) // Apply Translation
+	                .translate(-e.offsetX, -e.offsetY); // Move the transform origin back
+				}
+			});
+
+			$('.surface:not(#a):not(#c)').gesture({
+				start: function (e) {
+					console.log('gesture started on '+$(this).attr('id')+' at ('+e.offsetX+','+e.offsetY+')');
+
+					e.gestureObject.startTime = new Date().getTime();
+					e.gestureObject.swipe = false;
+
+					// change the color so we know a gesture is happening
+					$(this).css({'border-color': 'black'});
+				},
+
+				change: function (e) {
+					//var gesture = e.gestureObject;
+					//var currentTime = new Date().getTime();
+	
+	                var m = new MSCSSMatrix(e.target.currentStyle.transform); // Get the latest CSS transform on the element
+	                e.target.style.transform = m
+	                .translate(e.offsetX, e.offsetY) // Move the transform origin under the center of the gesture
+	                .rotate(e.rotation * 180 / Math.PI) // Apply Rotation
+	                .scale(e.scale) // Apply Scale
+	                .translate(e.translationX, e.translationY) // Apply Translation
+	                .translate(-e.offsetX, -e.offsetY); // Move the transform origin back
+
+					// see if the threshold has been passed
+					/*if (!gesture.swipe && (currentTime - gesture.startTime) >= SWIPE_THRESHOLD) {
+						// work out if it's a swipe or not,
+						// let's pretend it is
+						gesture.swipe = true;
+					}*/
+				},
+
+				end: function (e) {
+					console.log('gesture ended on '+$(this).attr('id')+' at ('+e.offsetX+','+e.offsetY+')');	
+
+					if (e.gestureObject.swipe) {
+						console.log('it was a swipe!');
+					}				
+
+					$(this).css({'border-color': 'transparent'});
+
+					dumpObj(e);
+				}
+			});
+		</script>
+	</body>
+</html>
